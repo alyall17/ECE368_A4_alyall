@@ -107,7 +107,7 @@ void switchFocus(WindowManager* manager, int windowID){
     manager->head = current;
 }
 
-// Get ID of current focussed window
+// Get ID of current focused window
 int getCurrentFocus(WindowManager* manager){
     if(!manager->head) return -1; // No open windows
     return(manager->tail ? manager->tail->windowID : manager->head->windowID); // Focus on last open window
@@ -132,11 +132,38 @@ void freeManager(WindowManager* manager){
 int main(void){
     // LOCAL VARIABLES
     WindowManager manager;
+    char command[10]; // String command input
+    int windowID; // Window ID input
+    int currentFocus; // Window currently in focus
 
     // EXECUTABLE STATEMENTS
     // Initialize Window Manager to NULL
     manager.head = NULL;
     manager.tail = NULL;
 
+    // Get input and call corresponding function
+    while(scanf("%s %d", command, &windowID) != EOF){
+        if(strcmp(command, "open") == 0){
+            openWindow(&manager, windowID);
+        }
+        else if(strcmp(command, "close") == 0){
+            closeWindow(&manager, windowID);
+        }
+        else if(strcmp(command, "switch") == 0){
+            switchFocus(&manager, windowID);
+        }
+    }
+
+    // Output currently focused window or terminate if nonde
+    currentFocus = getCurrentFocus(&manager);
+    if(currentFocus != -1){
+        printf("%d\n", currentFocus);
+    }
+    else{
+        freeManager(&manager);
+        return 0;
+    }
+
+    freeManager(&manager); // Clean up memory
     return 0;
 }
