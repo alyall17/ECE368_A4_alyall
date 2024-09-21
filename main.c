@@ -79,6 +79,55 @@ void closeWindow(WindowManager* manager, int windowID){
     free(current); // Free memory of closed window
 }
 
+// Switch focus to a specific window
+void switchFocus(WindowManager* manager, int windowID){
+    // Find window in the list
+    WindowNode* current = findWindow(manager, windowID);
+    if(!current || current == manager->head) return; // If not found or already at front return
+
+    // Move current window to front of the list
+    if(current->previous){
+        current->previous->next = current->next; // Bypass current
+    }
+    if(current->next){
+        current->next->previous = current->previous; // Bypass current
+    }
+
+    // If current is tail, update tail
+    if(current == manager->tail){
+        manager->tail = current->previous;
+    }
+
+    // Insert current at the front
+    current->next = manager->head;
+    current->previous = NULL;
+    if(manager->head){
+        manager->head->previous = current; // Old head's previous pointer now points to current
+    }
+    manager->head = current;
+}
+
+// Get ID of current focussed window
+int getCurrentFocus(WindowManager* manager){
+    if(!manager->head) return -1; // No open windows
+    return(manager->tail ? manager->tail->windowID : manager->head->windowID); // Focus on last open window
+}
+
+void freeManager(WindowManager* manager){
+    WindowNode* current = manager->head;
+    
+    // Free memory node by node
+    while(current){
+        WindowNode* next = current->next;
+        free(current);
+        current = next;
+    }
+
+    // Set head and tail to NULL
+    manager->head = NULL;
+    manager->tail = NULL;
+}
+
 // Main chain of command (main function)
 int main(void){
     // LOCAL VARIABLES
