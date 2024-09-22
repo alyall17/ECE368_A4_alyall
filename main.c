@@ -26,18 +26,20 @@ WindowNode* createNewWindow(int windowID){
     return(new); // return new node
 } 
 
-// Opens a new window in the manager by creating a new node and adding it to the linked list
+// Opens a new window in the manager by creating a new node and adding it to the front (focus position)
+// of the linked list
 void openWindow(WindowManager* manager, int windowID){
     // Create a new node
     WindowNode* new = createNewWindow(windowID);
+    new->next = manager->head; // Point new node's next to current head
 
-    // Add the new node to the end of the linked list if existing, or head if list is empty
-    if(manager->tail){
-        manager->tail->next = new; // Link new
-        new->previous = manager->tail; // Set previous pointer
+    // Add the new node to the front of the linked list if existing, or head if list is empty
+    if(manager->head){
+        manager->head->previous = new; // Update current head's previous
     }
-    else{
-        manager->head = new;
+    manager->head = new; // New node becomes head
+    if(!manager->tail){
+        manager->tail = new; // If first node, node is also the tail
     }
     manager->tail = new; // Update tail
 }
@@ -85,7 +87,7 @@ void switchFocus(WindowManager* manager, int windowID){
     WindowNode* current = findWindow(manager, windowID);
     if(!current || current == manager->head) return; // If not found or already at front return
 
-    // Move current window to front of the list
+    // Move current window from original position
     if(current->previous){
         current->previous->next = current->next; // Bypass current
     }
@@ -110,7 +112,8 @@ void switchFocus(WindowManager* manager, int windowID){
 // Get ID of current focused window
 int getCurrentFocus(WindowManager* manager){
     if(!manager->head) return -1; // No open windows
-    return(manager->tail ? manager->tail->windowID : manager->head->windowID); // Focus on last open window
+    return manager->head->windowID; // Return window in focus (first window)
+    //return(manager->tail ? manager->tail->windowID : manager->head->windowID); // Focus on last open window
 }
 
 void freeManager(WindowManager* manager){
@@ -152,16 +155,16 @@ int main(void){
         else if(strcmp(command, "switch") == 0){
             switchFocus(&manager, windowID);
         }
-    }
 
-    // Output currently focused window or terminate if nonde
-    currentFocus = getCurrentFocus(&manager);
-    if(currentFocus != -1){
-        printf("%d\n", currentFocus);
-    }
-    else{
-        freeManager(&manager);
-        return 0;
+        // Output currently focused window or terminate if none
+        currentFocus = getCurrentFocus(&manager);
+        if(currentFocus != -1){
+            printf("%d\n", currentFocus);
+        }
+        else{
+            freeManager(&manager);
+            return 0;
+        }
     }
 
     freeManager(&manager); // Clean up memory
