@@ -115,6 +115,7 @@ int getCurrentFocus(WindowManager* manager){
     return manager->head->windowID; // Return window in focus (first window)
 }
 
+// Frees memory of window manager (linked list)
 void freeManager(WindowManager* manager){
     WindowNode* current = manager->head;
     
