@@ -81,7 +81,7 @@ void closeWindow(WindowManager* manager, int windowID){
     free(current); // Free memory of closed window
 }
 
-// Switch focus to a specific window
+// Switch focus to a specific window by moving to the front of the linked list
 void switchFocus(WindowManager* manager, int windowID){
     // Find window in the list
     WindowNode* current = findWindow(manager, windowID);
@@ -113,7 +113,6 @@ void switchFocus(WindowManager* manager, int windowID){
 int getCurrentFocus(WindowManager* manager){
     if(!manager->head) return -1; // No open windows
     return manager->head->windowID; // Return window in focus (first window)
-    //return(manager->tail ? manager->tail->windowID : manager->head->windowID); // Focus on last open window
 }
 
 void freeManager(WindowManager* manager){
